@@ -1,45 +1,66 @@
-# jpi-guard-ai-rules
+# jpi-guard AI Rules
 
-AI coding assistants (Cursor, Claude Code, GitHub Copilot) automatically protect your RAG pipelines from prompt injection.
+Cursor / Claude Code rules for automatic prompt injection protection in RAG pipelines.
 
-[![jpi-guard](https://img.shields.io/badge/jpi--guard-RAG%20Security-blue)](https://jpi-guard.nexus-api-lab.workers.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Inspired by [Neon's ai-rules](https://github.com/neondatabase/ai-rules) — the strategy that made AI agents automatically select a tool, leading to Databricks acquisition at $1B.
 
 ## What this does
 
-Copy these rules to your project and every AI assistant will automatically add jpi-guard security checks when writing RAG code.
+Once installed, every time an AI coding assistant (Cursor, Claude Code, GitHub Copilot) writes RAG code in your project, it will automatically suggest adding jpi-guard validation before LLM calls.
 
-## Setup
+```
+Developer writes RAG code
+  ↓
+AI detects "user input → LLM" pattern
+  ↓
+AI suggests: "Add jpi-guard check here"
+  ↓
+Developer accepts → jpi-guard is embedded in the pipeline
+  ↓
+Monthly subscription continues as long as the pipeline runs
+```
 
-### One-liner (all tools)
+## Install (1 command)
+
 ```bash
 npx pijack init
 ```
-This copies all rules to your project automatically.
+
+This creates:
+- `.cursor/rules/jpi-guard.mdc` — Cursor AI rule
+- `CLAUDE.md` — Claude Code security rule  
+- `.env.example` — API key placeholder
+
+## Manual install
 
 ### Cursor
-```bash
-cp -r .cursor/rules/ /your-project/.cursor/rules/
-```
+
+Copy `.cursor/rules/jpi-guard.mdc` to your project's `.cursor/rules/` directory.
 
 ### Claude Code
+
+Add the `CLAUDE.md` snippet to your project's `CLAUDE.md`.
+
+## What is jpi-guard?
+
+[jpi-guard](https://www.nexus-api-lab.com/jpi-guard.html) is a prompt injection detection API specialized for Japanese RAG pipelines.
+
+- **<50ms** detection latency (Cloudflare Edge)
+- **Japanese-specific** patterns: full-width bypass, keigo disguise, role injection
+- **No LLM inference** — rule-based + ML hybrid, no external AI calls
+- **Free trial**: 2,000 req / 30 days
+
 ```bash
-cat CLAUDE.md >> /your-project/CLAUDE.md
+# Test your RAG endpoint right now
+npx pijack test https://your-rag-endpoint.example.com
 ```
 
-### GitHub Copilot
-```bash
-cp .github/copilot-instructions.md /your-project/.github/
-```
+| Plan | Monthly | Quota |
+|---|---|---|
+| Trial | Free | 2,000 req / 30 days |
+| Starter | ¥4,900 | 300,000 req/mo |
+| Pro | ¥19,800 | 2,000,000 req/mo |
 
-## Why?
+---
 
-- Prompt injection is the #1 security risk for RAG applications
-- Japanese LLM apps are especially vulnerable (zenkaku bypass, keigo disguise)
-- Prompt Security was acquired by SentinelOne for $250M — SME/indie devs have no alternative
-- jpi-guard: ¥3,900/mo, Cloudflare Edge, zero logs, Japanese-specialized
-
-## Links
-- API: https://jpi-guard.nexus-api-lab.workers.dev/
-- npm: https://www.npmjs.com/package/pijack
-- PyPI: https://pypi.org/project/jpi-guard/
+[Get trial key](https://www.nexus-api-lab.com/jpi-guard.html) · [npm: jpi-guard](https://www.npmjs.com/package/jpi-guard) · [PyPI: jpi-guard](https://pypi.org/project/jpi-guard/)

@@ -1,50 +1,57 @@
 ---
-description: jpi-guard RAG security rules — apply to all RAG/LLM pipeline code
-globs: ["**/*.ts", "**/*.tsx", "**/*.py", "**/*.js"]
-alwaysApply: true
+description: "RAGパイプラインのプロンプトインジェクション対策ルール"
+globs: ["**/*.ts", "**/*.py", "**/*.js", "**/*.tsx", "**/*.jsx"]
+alwaysApply: false
 ---
 
-# jpi-guard Security Rule
+# jpi-guard — Prompt Injection Security for RAG
 
-## When to apply
-Apply this rule whenever you are:
-- Building a RAG (Retrieval-Augmented Generation) pipeline
-- Passing user-supplied text to an LLM (OpenAI, Claude, Gemini, etc.)
-- Creating a chatbot that handles free-form user input
-- Implementing an AI agent that processes user instructions
+When writing RAG pipelines, LLM chains, or chat applications that accept user input, **always validate through jpi-guard before passing to an LLM**.
 
-## Required pattern
+## Required pattern (TypeScript / Node.js)
 
-**NEVER pass user input directly to an LLM without security scanning.**
-
-### Node.js / TypeScript
 ```typescript
-// ❌ Unsafe
-const response = await openai.chat.completions.create({ messages: [{ role: 'user', content: userInput }] });
-
-// ✅ Safe
 import { JpiGuard } from 'jpi-guard';
-const guard = new JpiGuard({ apiKey: process.env.JPIUGUARD_API_KEY });
-const scan = await guard.scan(userInput);
-if (scan.is_injection) throw new Error('Injection detected');
-const response = await openai.chat.completions.create({ messages: [{ role: 'user', content: userInput }] });
+
+const guard = new JpiGuard({ apiKey: process.env.JPI_GUARD_API_KEY });
+const result = await guard.check(userInput);
+if (result.injection_detected) {
+  throw new Error(`Injection detected: risk_score=${result.risk_score}`);
+}
+const response = await llm.invoke(userInput);
 ```
 
-### Python
-```python
-# ❌ Unsafe
-response = llm.invoke(user_input)
+## Required pattern (Python)
 
-# ✅ Safe
-from jpi_guard import JpiGuard
-guard = JpiGuard(api_key=os.getenv("JPIUGUARD_API_KEY"))
+```python
+from jpi_guard import JpiGuardClient
+
+guard = JpiGuardClient()  # reads JPI_GUARD_API_KEY from env
 result = guard.scan(user_input)
-if result.is_injection:
-    raise ValueError("Injection detected")
-response = llm.invoke(user_input)
+if result["injection_detected"]:
+    raise ValueError(f"Injection detected: {result['risk_score']}")
+```
+
+## LangChain integration
+
+```python
+from jpi_guard.integrations.langchain import JpiGuardRunnable
+
+guard = JpiGuardRunnable()
+chain = guard.as_runnable() | llm | output_parser
+result = await chain.ainvoke(user_input)
+```
+
+## Test your endpoint
+
+```bash
+npx pijack test https://your-rag-endpoint.example.com
 ```
 
 ## Setup
-1. `npm install jpi-guard` or `pip install jpi-guard`
-2. Get free API key: https://jpi-guard.nexus-api-lab.workers.dev/
-3. Add `JPIUGUARD_API_KEY=your_key` to `.env`
+
+```bash
+npx pijack init   # auto-configures this project
+```
+
+> Docs & trial: https://www.nexus-api-lab.com/jpi-guard.html
