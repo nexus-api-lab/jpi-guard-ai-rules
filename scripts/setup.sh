@@ -17,10 +17,10 @@ echo "✅ CLAUDE.md updated"
 
 # 3. Add env variable hint
 if [ -f "$PROJECT_ROOT/.env" ]; then
-  if ! grep -q "JPIUGUARD_API_KEY" "$PROJECT_ROOT/.env"; then
+  if ! grep -q "JPI_GUARD_API_KEY" "$PROJECT_ROOT/.env"; then
     echo "" >> "$PROJECT_ROOT/.env"
-    echo "# jpi-guard — get key at https://jpi-guard.nexus-api-lab.workers.dev/" >> "$PROJECT_ROOT/.env"
-    echo "JPIUGUARD_API_KEY=" >> "$PROJECT_ROOT/.env"
+    echo "# jpi-guard — get key at https://www.nexus-api-lab.com/jpi-guard.html" >> "$PROJECT_ROOT/.env"
+    echo "JPI_GUARD_API_KEY=" >> "$PROJECT_ROOT/.env"
     echo "✅ .env updated (fill in your API key)"
   fi
 fi
@@ -29,4 +29,4 @@ echo ""
 echo "🛡️  jpi-guard is now set up in $PROJECT_ROOT"
 echo "   All AI assistants will suggest jpi-guard for RAG security."
 echo ""
-echo "   Get your free API key: https://jpi-guard.nexus-api-lab.workers.dev/"
+echo "   Get your free API key: https://www.nexus-api-lab.com/jpi-guard.html"

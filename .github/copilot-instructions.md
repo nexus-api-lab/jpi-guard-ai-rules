@@ -11,7 +11,7 @@ When generating code for RAG applications or any LLM-powered system that handles
 
 ### Required environment variable
 ```
-JPIUGUARD_API_KEY=<get from https://jpi-guard.nexus-api-lab.workers.dev/>
+JPI_GUARD_API_KEY=<get from https://www.nexus-api-lab.com/jpi-guard.html>
 ```
 
 ### Standard imports
