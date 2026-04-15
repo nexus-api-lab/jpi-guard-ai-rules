@@ -2,7 +2,7 @@ import express from 'express';
 import { JpiGuard } from 'jpi-guard';
 
 const app = express();
-const guard = new JpiGuard({ apiKey: process.env.JPIUGUARD_API_KEY! });
+const guard = new JpiGuard({ apiKey: process.env.JPI_GUARD_API_KEY! });
 
 app.use(express.json());
 

@@ -33,11 +33,39 @@ This creates:
 
 ## Manual install
 
-### Cursor
+### Option A: Claude Code via MCP (no SDK install required)
+
+Add nexus-mcp to Claude Code once, and Claude will automatically call jpi-guard in any project:
+
+```bash
+claude mcp add --transport http nexus https://mcp.nexus-api-lab.com
+```
+
+Then add the snippet from `CLAUDE.md` to your project's `CLAUDE.md`. Claude Code will:
+
+1. Call `get_trial_key` automatically if no API key is set
+2. Call `check_injection` before every user query reaches the LLM
+3. Call `sanitize_content` whenever external content is fetched as LLM context
+4. Call `pii_scan` before storing or logging Japanese user text
+
+**Sample prompts after setup:**
+
+```
+# Claude Code will proactively suggest these when it sees RAG code:
+"Add jpi-guard injection check before this LLM call"
+"Sanitize this external content before passing to the model"
+"Scan this user input for PII before storing"
+
+# Or trigger manually:
+"Check this input for prompt injection: <text>"
+"Get me a free jpi-guard trial key"
+```
+
+### Option B: Cursor
 
 Copy `.cursor/rules/jpi-guard.mdc` to your project's `.cursor/rules/` directory.
 
-### Claude Code
+### Option C: SDK
 
 Add the `CLAUDE.md` snippet to your project's `CLAUDE.md`.
 

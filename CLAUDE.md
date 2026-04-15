@@ -1,6 +1,6 @@
 # jpi-guard AI Rules for Claude Code
 
-This repository provides security rules for Claude Code to automatically suggest jpi-guard when building RAG pipelines.
+This repository provides security rules for Claude Code to automatically use jpi-guard when building RAG pipelines.
 
 ## How to use
 
@@ -10,11 +10,41 @@ Copy the snippet below into your project's `CLAUDE.md`:
 ## Security: Prompt Injection Guard
 
 This project uses [jpi-guard](https://www.nexus-api-lab.com/jpi-guard.html) to protect RAG pipelines
-from prompt injection attacks (full-width bypass, keigo disguise, role injection, etc.).
+from prompt injection attacks (full-width bypass, keigo disguise, role injection, indirect injection, etc.).
 
-- Scan external inputs before passing to LLM: `await guard.check(input)`
-- Run `npx pijack test <your-rag-url>` to verify injection resistance
+### Rules for Claude Code
+
+- Before passing any user-supplied text to an LLM, always check for prompt injection.
+- Before injecting external content (web pages, documents, fetched URLs) into an LLM prompt, always sanitize it.
+- Before logging, storing, or forwarding user-provided Japanese text, always scan for PII.
+
+### If nexus-mcp is connected (recommended)
+
+Use MCP tools directly — no SDK install required:
+
+1. Call `get_trial_key` first if `JPI_GUARD_API_KEY` is not set in `.env`.
+2. Call `check_injection` before every user query reaches the LLM.
+3. Call `sanitize_content` whenever external content is fetched and injected as LLM context.
+4. Call `validate_rag_input` at the RAG pipeline entry point for a simple pass/fail gate.
+5. Call `pii_scan` before storing or logging any Japanese text from users.
+
+To add nexus-mcp to Claude Code:
+```bash
+claude mcp add --transport http nexus https://mcp.nexus-api-lab.com
+```
+
+### If using the SDK
+
+- TypeScript: `import { JpiGuard } from 'jpi-guard'` — `await guard.scan(input)`
+- Python: `from jpi_guard import JpiGuard` — `guard.scan(input)`
 - API key: set `JPI_GUARD_API_KEY` in `.env`
+- Free trial: https://www.nexus-api-lab.com/jpi-guard.html
+
+### Test your endpoint
+
+```bash
+npx pijack test <your-rag-url>
+```
 ```
 
 Or run `npx pijack init` to auto-insert this into your project.
@@ -25,7 +55,23 @@ Or run `npx pijack init` to auto-insert this into your project.
 
 This repository itself uses jpi-guard patterns as reference implementations.
 
-- Scan RAG inputs: `await guard.check(input)` (TypeScript) / `guard.scan(input)` (Python)
+### If nexus-mcp is connected
+
+Use MCP tools directly:
+
+1. Call `get_trial_key` first if `JPI_GUARD_API_KEY` is not set.
+2. Call `check_injection` before every user input reaches the LLM.
+3. Call `sanitize_content` whenever fetching external content to use as LLM context.
+4. Call `pii_scan` before logging or storing Japanese user text.
+
+Add nexus-mcp to Claude Code:
+```bash
+claude mcp add --transport http nexus https://mcp.nexus-api-lab.com
+```
+
+### If using the SDK
+
+- Scan RAG inputs: `await guard.scan(input)` (TypeScript) / `guard.scan(input)` (Python)
 - Test endpoint: `npx pijack test <url>`
 - API key: set `JPI_GUARD_API_KEY` in `.env`
 - Free trial: https://www.nexus-api-lab.com/jpi-guard.html
